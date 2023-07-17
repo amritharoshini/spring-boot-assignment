@@ -1,30 +1,56 @@
 package com.assignment.userservice.configuration;
 
-import javax.sql.DataSource;
-
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
+import com.assignment.userservice.repository.SecurityUserRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class AppConfig {
 	
+	@Autowired
+	private SecurityUserRepository repository;
+	
+	@Bean
+	public UserDetailsService userDetailsService() {
+		return username -> repository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+	}
+	
+	@Bean
+	public AuthenticationProvider authentionProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService());
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return authProvider;
+	}
+	
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 	
-	@Configuration
-	public class DataSourceConfig {
-	    @Bean
-	    public DataSource getDataSource() {
-	        return DataSourceBuilder.create()
-	          .driverClassName("com.mysql.cj.jdbc.Driver")
-	          .url("jdbc:mysql://localhost:3306/user_profile")
-	          .username("root")
-	          .password("root")
-	          .build();	
-	    }
-	}
 }
