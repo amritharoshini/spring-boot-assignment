@@ -14,7 +14,7 @@ Before getting started, make sure you have the following prerequisites installed
 
 1. Clone the repository to your local machine:
 
-git clone https://github.com/amritharoshini/spring-boot-assigment.git
+git clone https://github.com/amritharoshini/spring-boot-assignment.git
 
 2. Navigate to the project directory:
    
