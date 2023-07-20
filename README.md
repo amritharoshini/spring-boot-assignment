@@ -31,7 +31,7 @@ mvn clean package
 
 6. Run the application:
 
-java -jar target/spring-boot-assignment.jar
+java -jar target/user-service-0.0.1-SNAPSHOT.jar
 
 6. Access the application:
 
